@@ -10,36 +10,48 @@ class About extends Component {
         <div className="container App-content">
           <div className="row text-xs-center text-sm-left">
             <div className="col-xs-12 col-sm-6">
-              <h2>What I do</h2>
+              <h2>About this app</h2>
               <p>
-                I can help you with all your web needs. Whether you want a
-                completely new website, some simple updates, or if you're
-                encountering problems and want somebody to sort them out - get
-                in touch today and I'll explain how I can help.
+                This is a demonstration of a MERN web app. The front-end of the
+                app is built using React and Bootstrap 4. The back-end is built
+                using Node, Express, MongoDB and Mongoose. The front-end is
+                hosted on Google Firebase, the Node back-end is hosted on
+                Heroku, while the MongoDB database is hosted on MongoDB Atlas.
               </p>
               <p>
-                I specialise in the standard web technologies HTML, CSS and
-                Javascript but I also have experience of working with tools such
-                as Wordpress, Bootstrap, React, MongoDB, NodeJS and jQuery.
+                This project simulates a simple CRUD (Create, Read, Update,
+                Delete) interface to a fictional company's office and staff
+                data. The user can read the company data, make changes to the
+                data, delete records, and create new records.
               </p>
               <p>
-                Even if you need help with software that is new to me, I can
-                usually get up to speed very quickly so that in a short space of
-                time I can safely modify existing installations and identify
-                effective solutions to problems.
+                I built this project to test my new MERN skills after working
+                through Greg Lim's excellent books{" "}
+                <em>"Beginning Node.js, Express, and MongoDB Development"</em>{" "}
+                and <em>"Beginning React"</em> which I highly recommend. My plan
+                is to duplicate the front-end using Vue and Angluar once the
+                React implementation is working to my satisfaction.
               </p>
             </div>
             <div className="col-xs-12 col-sm-6">
               <h2>Who I am</h2>
               <p>
-                I'm a freelance web developer based in the historic UK town of
-                Malmesbury in Wiltshire. My background includes over thirty
-                years of working for big corporations and SMEs, government
-                departments, the police, and charities.
+                My name's Mark Allen. I work part-time as a freelance web
+                developer, building and maintaining webistes for small
+                businesses and charities. I am based in the historic market town
+                of Malmesbury in Wiltshire in the UK.
+              </p>
+              <p>
+                My background includes over thirty years of working for big
+                corporations and SMEs, government departments, the police, and
+                charities. Recently I have been combining part-time freelance
+                work with my main role of being a stay-at-home-parent for my two
+                children. I am currently refining my skillset in preparation for
+                returning to full-time work.
               </p>
               <p>
                 I've got qualifications in front-end web development, computer
-                programming, Unix & Linux systems administration, technical
+                programming, Unix &amp; Linux systems administration, technical
                 writing, and copywriting. I also have a first-class BSc(Hons)
                 degree in Environmental Studies with a focus on communication
                 and environmental technology.

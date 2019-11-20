@@ -6,10 +6,10 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 // Navigation components
 import HomePage from "./HomePage";
-import Services from "./Services";
+import Staff from "./Staff";
+import Offices from "./Offices";
 import About from "./About";
-import Contact from "./Contact";
-import Reviews from "./Reviews";
+
 
 class NavBar extends Component {
   render() {
@@ -21,7 +21,7 @@ class NavBar extends Component {
         >
           <div className="container">
             <a className="navbar-brand" href="/">
-              Mark Allen
+              Company123uk
             </a>
             <button
               className="navbar-toggler navbar-toggler-right"
@@ -43,23 +43,18 @@ class NavBar extends Component {
                   </a>
                 </li>
                 <li className="nav-item">
+                  <a className="nav-link" href="/staff">
+                    Staff
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="/offices">
+                    Offices
+                  </a>
+                </li>
+                <li className="nav-item">
                   <a className="nav-link" href="/about">
                     About
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="/services">
-                    Services
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="/reviews">
-                    Reviews
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="/contact">
-                    Contact
                   </a>
                 </li>
               </ul>
@@ -67,10 +62,9 @@ class NavBar extends Component {
           </div>
         </nav>
         <Switch>
-          <Route path="/services" component={Services} />
+          <Route path="/staff" component={Staff} />
+          <Route path="/offices" component={Offices} />
           <Route path="/about" component={About} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/reviews" component={Reviews} />
           <Route exact path="/" component={HomePage} />
         </Switch>
       </BrowserRouter>

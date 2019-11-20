@@ -10,24 +10,29 @@
 .App-homepage {
   background-color: #273c75;
 }
-.App-services {
+.App-staff {
   background-color: #218c74;
+}
+.App-offices {
+  background-color: #33700f;
 }
 .App-about {
   background-color: #b33939;
 }
-.App-contact {
-  background-color: #e1b12c;
-}
-.App-reviews {
-  background-color: #487eb0;
-}
+
 
 .App-footer {
   background-color: #4F4F4F;
   font-size: calc(10px + 0.5vmin);
   min-height: 5vh;
   color: white;
+}
+
+.col123-headline {
+  color: palegoldenrod;
+}
+.co123-warning {
+  color: lightslategray;
 }
 
 .padding-top-5vh {
