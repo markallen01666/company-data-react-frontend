@@ -1,2 +1,4 @@
-# company-data-react-frontend
-React front end for revised version of previously built company data CRUD app
+# React company CRUD frontend
+HTML, CSS, JS, Bootstrap 4 and React
+
+A new React CRUD frontend to serve my company data test project

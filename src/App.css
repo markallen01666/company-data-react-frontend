@@ -1,0 +1,67 @@
+.App-body {
+  min-height: 100vh;
+  color: white;
+}
+
+.App-content {
+  padding-top: 25vh;
+}
+
+.App-homepage {
+  background-color: #273c75;
+}
+.App-services {
+  background-color: #218c74;
+}
+.App-about {
+  background-color: #b33939;
+}
+.App-contact {
+  background-color: #e1b12c;
+}
+.App-reviews {
+  background-color: #487eb0;
+}
+
+.App-footer {
+  background-color: #4F4F4F;
+  font-size: calc(10px + 0.5vmin);
+  min-height: 5vh;
+  color: white;
+}
+
+.padding-top-5vh {
+  padding-top: 5vh;
+}
+.padding-bottom-5vh {
+  padding-bottom: 5vh;
+}
+
+.card {
+  color: grey;
+}
+.card-icon-1 {
+  color: #227093;
+}
+.card-icon-2 {
+  color: #cd6133;
+}
+.card-icon-3 {
+  color: #474787;
+}
+.card-icon-4 {
+  color: #b33939;
+}
+
+/* Contact form */
+.gotcha {
+  display: none;
+}
+.input-field {
+  width: 100%;
+}
+@media only screen and (min-width: 800px) {
+  .input-field {
+    width: 70%;
+  }
+}
