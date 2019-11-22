@@ -10,9 +10,12 @@ import Staff from "./Staff";
 import Offices from "./Offices";
 import About from "./About";
 
-
 class NavBar extends Component {
   render() {
+    // Paths to backend data
+    const employeeDataURL = this.props.backendURL + "/employees";
+    const officeDataURL = this.props.backendURL + "/offices";
+
     return (
       <BrowserRouter>
         <nav
@@ -62,8 +65,18 @@ class NavBar extends Component {
           </div>
         </nav>
         <Switch>
-          <Route path="/staff" component={Staff} />
-          <Route path="/offices" component={Offices} />
+          <Route
+            path="/staff"
+            render={props => (
+              <Staff {...props} employeeDataURL={employeeDataURL} />
+            )}
+          />
+          <Route
+            path="/offices"
+            render={props => (
+              <Offices {...props} officeDataURL={officeDataURL} />
+            )}
+          />
           <Route path="/about" component={About} />
           <Route exact path="/" component={HomePage} />
         </Switch>

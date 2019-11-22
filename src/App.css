@@ -8,7 +8,7 @@
 }
 
 .App-homepage {
-  background-color: #273c75;
+  background-color: #474f64;
 }
 .App-staff {
   background-color: #218c74;
@@ -44,6 +44,9 @@
 
 .card {
   color: grey;
+}
+.card-spacing {
+  padding: 5px 0 5px 0;
 }
 .card-icon-1 {
   color: #227093;
