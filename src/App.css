@@ -11,7 +11,7 @@
   background-color: #474f64;
 }
 .App-staff {
-  background-color: #218c74;
+  background-color: #6d5470;
 }
 .App-offices {
   background-color: #33700f;
@@ -46,30 +46,29 @@
   color: grey;
 }
 .card-spacing {
-  padding: 5px 0 5px 0;
+  margin: 10px 0 !important;
 }
-.card-icon-1 {
-  color: #227093;
+ /* Create, Update, Delete button styling */
+.btn-circle {
+    width: 40px;
+    height: 40px;
+    padding: 6px 0px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff;
 }
-.card-icon-2 {
-  color: #cd6133;
+.btn-create {
+  background-color: rgb(83, 189, 83);
 }
-.card-icon-3 {
-  color: #474787;
+.btn-update {
+  background-color: rgb(241, 177, 57);
+  color: #ffffff;
 }
-.card-icon-4 {
-  color: #b33939;
-}
-
-/* Contact form */
-.gotcha {
-  display: none;
-}
-.input-field {
-  width: 100%;
-}
-@media only screen and (min-width: 800px) {
-  .input-field {
-    width: 70%;
-  }
+.btn-delete {
+  background-color: rgb(197, 66, 66);
+  color: #ffffff;
 }
