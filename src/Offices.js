@@ -15,6 +15,10 @@ class Offices extends Component {
 
   componentDidMount() {
     this.getOfficeData();
+    window.$('[data-toggle="tooltip"]').tooltip();
+  }
+  componentDidUpdate() {
+    window.$('[data-toggle="tooltip"]').tooltip();
   }
 
   getOfficeData() {
@@ -61,12 +65,12 @@ class Offices extends Component {
             </div>
             <div className="row justify-content-center">
               <div className="">
-                <button type="button" className="btn btn-update btn-circle">
+                <button type="button" className="btn btn-update btn-circle" data-toggle="tooltip" data-placement="top" title="Edit record">
                   <i className="fas fa-pencil-alt"></i>
                 </button>
               </div>
               <div className="text-center">
-                <button type="button" className="btn btn-delete btn-circle">
+                <button type="button" className="btn btn-delete btn-circle" data-toggle="tooltip" data-placement="top" title="Delete record">
                   <i className="fas fa-trash"></i>
                 </button>
               </div>
@@ -84,7 +88,7 @@ class Offices extends Component {
               <h2>Office records</h2>
             </div>
             <div className="col-sm-2 text-right">
-              <button type="button" className="btn btn-create btn-circle">
+              <button type="button" className="btn btn-create btn-circle" data-toggle="tooltip" data-placement="top" title="Create a new record">
                 <i className="fas fa-plus"></i>
               </button>
             </div>
