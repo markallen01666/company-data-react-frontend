@@ -50,15 +50,14 @@ class About extends Component {
                 returning to full-time work.
               </p>
               <p>
-                I've got qualifications in front-end web development, computer
-                programming, Unix &amp; Linux systems administration, technical
-                writing, and copywriting. I also have a first-class BSc(Hons)
+                I've got certifications in front-end web development, JavaScript
+                programming, and technical writing. I also have a first-class BSc(Hons)
                 degree in Environmental Studies with a focus on communication
                 and environmental technology.
               </p>
               <p>
                 In my spare time I'm an independent board member for a housing
-                association with 12,000 homes in the West of England.
+                association with 12,000 homes in the West of England, and a trustee for a small community development charity.
               </p>
             </div>
           </div>

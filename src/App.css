@@ -42,12 +42,14 @@
   padding-bottom: 5vh;
 }
 
+/* Data cards */
 .card {
   color: grey;
 }
 .card-spacing {
   margin: 10px 0 !important;
 }
+
  /* Create, Update, Delete button styling */
 .btn-circle {
     width: 40px;
@@ -71,4 +73,9 @@
 .btn-delete {
   background-color: rgb(197, 66, 66);
   color: #ffffff;
+}
+
+/* Button modals */
+.modal-content {
+  color: grey;
 }
