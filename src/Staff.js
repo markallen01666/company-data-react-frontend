@@ -17,12 +17,19 @@ class Services extends Component {
     this.getEmployeeData();
     window.$('[data-toggle="tooltip"]').tooltip();
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
-      var button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      var recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
-      var modal = window.$(this);
+      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let modal = window.$(this);
+      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+    });
+    window.$("#updateRecordModal").on("show.bs.modal", function(event) {
+      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let modal = window.$(this);
       modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
     });
   }
+   
   componentDidUpdate() {
     window.$('[data-toggle="tooltip"]').tooltip();
   }
@@ -190,7 +197,12 @@ class Services extends Component {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">Enter your data here</div>
+              <div className="modal-body">
+                <strong>
+                  <h6 className="modal-record-title text-primary">Employee</h6>
+                </strong>
+                <p>Enter your data here</p>
+              </div>
               <div className="modal-footer">
                 <button
                   type="button"
@@ -234,7 +246,9 @@ class Services extends Component {
                 </button>
               </div>
               <div className="modal-body">
-                <strong><h6 className="modal-record-title text-primary">Employee</h6></strong>
+                <strong>
+                  <h6 className="modal-record-title text-primary">Employee</h6>
+                </strong>
                 <p>
                   You are about to delete this record. If you continue, this
                   information will be permanently deleted and cannot be

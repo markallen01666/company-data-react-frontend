@@ -17,9 +17,15 @@ class Offices extends Component {
     this.getOfficeData();
     window.$('[data-toggle="tooltip"]').tooltip();
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
-      var button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      var recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
-      var modal = window.$(this);
+      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let modal = window.$(this);
+      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+    });
+    window.$("#updateRecordModal").on("show.bs.modal", function(event) {
+      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let modal = window.$(this);
       modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
     });
   }
@@ -70,7 +76,11 @@ class Offices extends Component {
               <div className="card-text">{"Postcode: " + data.postcode}</div>
             </div>
             <div className="row justify-content-center">
-              <span data-toggle="modal" data-target="#updateRecordModal">
+              <span
+                data-toggle="modal"
+                data-target="#updateRecordModal"
+                data-record-title={data.office}
+              >
                 <button
                   type="button"
                   className="btn btn-update btn-circle"
@@ -191,7 +201,12 @@ class Offices extends Component {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">Enter your data here</div>
+              <div className="modal-body">
+                <strong>
+                  <h6 className="modal-record-title text-primary">Office</h6>
+                </strong>
+                <p>Enter your data here</p>
+              </div>
               <div className="modal-footer">
                 <button
                   type="button"
