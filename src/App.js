@@ -9,8 +9,8 @@ import NavBar from "./NavBar";
 import Footer from "./Footer";
 
 // Backend URL
-const backendURL = "https://company-data-node-backend.herokuapp.com";
-
+//const backendURL = "https://company-data-node-backend.herokuapp.com";
+const backendURL = "http://localhost:4000";
 class App extends Component {
   render() {
     return (

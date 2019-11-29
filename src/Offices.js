@@ -11,11 +11,70 @@ class Offices extends Component {
     this.state = {
       data: []
     };
+    this.handleSubmitAddOfficeRecord = this.handleSubmitAddOfficeRecord.bind(
+      this
+    );
+    this.handleCreateDocumentReset = this.handleCreateDocumentReset.bind(this);
+  }
+
+  getOfficeData() {
+    axios.get(this.props.officeDataURL).then(res => {
+      this.setState({
+        data: res.data
+      });
+    });
+  }
+
+  handleSubmitAddOfficeRecord(event) {
+    event.preventDefault();
+    let formData = {
+      office: document.getElementById("office").value,
+      building: document.getElementById("building").value,
+      number: document.getElementById("number").value,
+      street: document.getElementById("street").value,
+      town: document.getElementById("town").value,
+      postcode: document.getElementById("postcode").value,
+      adminLock: document.getElementById("adminLock").value
+    };
+    let formMessage = document.getElementById("formMessage");
+    axios
+      .post(this.props.officeDataURL + "/add", formData)
+      .then(response => {
+        console.log("Response:");
+        console.log(response);
+        if (response.data.status === "Fail") {
+          formMessage.className = "modal-error";
+        } else {
+          formMessage.className = "modal-success";
+          document.getElementById("addOfficeButton").className += " btn-hide";
+        }
+        formMessage.innerHTML = response.data.message;
+      })
+      .catch(error => {
+        console.log("Error");
+        console.log(error);
+      });
+  }
+
+  handleCreateDocumentReset() {
+    // Tidy up when create document modal closes
+    document.getElementById("addOfficeRecordForm").reset();
+    document.getElementById("formMessage").innerHTML = "";
+    document.getElementById("formMessage").className = "";
+    document.getElementById("addOfficeButton").className="btn btn-primary";
   }
 
   componentDidMount() {
     this.getOfficeData();
-    window.$('[data-toggle="tooltip"]').tooltip();
+    // Event handlers for modal forms
+    // New document form submit
+    document
+      .getElementById("addOfficeRecordForm")
+      .addEventListener("submit", this.handleSubmitAddOfficeRecord);
+      // New socument form close
+      document.getElementById("createDocumentCloseButton").addEventListener("click", this.handleCreateDocumentReset);
+
+    // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
       let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
@@ -28,17 +87,10 @@ class Offices extends Component {
       let modal = window.$(this);
       modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
     });
+    window.$('[data-toggle="tooltip"]').tooltip();
   }
   componentDidUpdate() {
     window.$('[data-toggle="tooltip"]').tooltip();
-  }
-
-  getOfficeData() {
-    axios.get(this.props.officeDataURL).then(res => {
-      this.setState({
-        data: res.data
-      });
-    });
   }
 
   render() {
@@ -74,6 +126,7 @@ class Offices extends Component {
               </div>
               <div className="card-text">{"City: " + data.town}</div>
               <div className="card-text">{"Postcode: " + data.postcode}</div>
+              <div className="card-text">{"adminLock: " + data.adminLock}</div>
             </div>
             <div className="row justify-content-center">
               <span
@@ -137,11 +190,14 @@ class Offices extends Component {
           <div className="row padding-bottom-5vh">{officeCards}</div>
           <div className="row pb-1"></div>
         </div>
+
+        {/* --------- Create modals - in page popup boxes --------- */}
+
         {/* Create record modal */}
         <div
           className="modal fade"
           id="createRecordModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="createRecordModalLabel"
           aria-hidden="true"
@@ -161,17 +217,123 @@ class Offices extends Component {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">Enter your data here</div>
+              <div className="modal-body">
+                <form id="addOfficeRecordForm">
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="office name"
+                        id="office"
+                        name="office"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Office names must be unique"
+                        required
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="building name"
+                        id="building"
+                        name="building"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="street number"
+                        id="number"
+                        name="number"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="street"
+                        placeholder="street name"
+                        id="street"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="town"
+                        placeholder="town/city name"
+                        id="town"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="postcode"
+                        placeholder="postcode"
+                        id="postcode"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <label>adminLock?</label>
+                      <select
+                        name="adminLock"
+                        id="adminLock"
+                        className="form-control"
+                        defaultValue="false"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Locked records can only be changed/deleted by the Administrator"
+                      >
+                        <option value="false">False</option>
+                        <option value="true">True</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div id="formMessage"></div>
+                  <br />
+                  <div className="form-group">
+                    <button
+                      type="submit"
+                      value="submit"
+                      className="btn btn-primary"
+                      id="addOfficeButton"
+                    >
+                      Add office
+                    </button>
+                  </div>
+                </form>
+              </div>
               <div className="modal-footer">
                 <button
+                  id="createDocumentCloseButton"
                   type="button"
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
                   Close
-                </button>
-                <button type="button" className="btn btn-primary">
-                  Save changes
                 </button>
               </div>
             </div>
@@ -181,7 +343,7 @@ class Offices extends Component {
         <div
           className="modal fade"
           id="updateRecordModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="updateRecordModalLabel"
           aria-hidden="true"
@@ -226,7 +388,7 @@ class Offices extends Component {
         <div
           className="modal fade"
           id="deleteRecordModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="deleterecordModalLabel"
           aria-hidden="true"

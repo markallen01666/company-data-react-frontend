@@ -74,8 +74,17 @@
   background-color: rgb(197, 66, 66);
   color: #ffffff;
 }
+.btn-hide {
+  display: none;
+}
 
-/* Button modals */
+/* Modals */
 .modal-content {
   color: grey;
+}
+.modal-error {
+  color: red;
+}
+.modal-success {
+  color: green;
 }
