@@ -1,4 +1,4 @@
-// React Home page content component
+// Company Data App Frontend - React Homepage view component
 // M. Allen - 2019
 
 import React, { Component } from "react";

@@ -1,4 +1,4 @@
-// React Footer component
+// Company Data App Frontend - React Footer component
 // M. Allen - 2019
 
 import React, { Component } from "react";

@@ -1,4 +1,4 @@
-// React Navbar component
+// Company Data App Frontend - React Navbar component
 // M. Allen - 2019
 
 import React, { Component } from "react";

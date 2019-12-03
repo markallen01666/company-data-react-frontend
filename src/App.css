@@ -1,12 +1,29 @@
+/* Company Data App Frontend - styling 
+   Mark Allen - 2019
+*/
+
+/* General settings */
 .App-body {
   min-height: 100vh;
   color: white;
 }
-
 .App-content {
   padding-top: 25vh;
 }
+.App-footer {
+  background-color: #4F4F4F;
+  font-size: calc(10px + 0.5vmin);
+  min-height: 5vh;
+  color: white;
+}
+.padding-top-5vh {
+  padding-top: 5vh;
+}
+.padding-bottom-5vh {
+  padding-bottom: 5vh;
+}
 
+/* View specific */
 .App-homepage {
   background-color: #474f64;
 }
@@ -19,15 +36,6 @@
 .App-about {
   background-color: #b33939;
 }
-
-
-.App-footer {
-  background-color: #4F4F4F;
-  font-size: calc(10px + 0.5vmin);
-  min-height: 5vh;
-  color: white;
-}
-
 .col123-headline {
   color: palegoldenrod;
 }
@@ -35,14 +43,7 @@
   color: lightslategray;
 }
 
-.padding-top-5vh {
-  padding-top: 5vh;
-}
-.padding-bottom-5vh {
-  padding-bottom: 5vh;
-}
-
-/* Data cards */
+/* Data card styling */
 .card {
   color: grey;
 }
@@ -78,7 +79,7 @@
   display: none;
 }
 
-/* Modals */
+/* Modal styling */
 .modal-content {
   color: grey;
 }

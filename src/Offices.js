@@ -1,4 +1,4 @@
-// React Offices page content component
+// Company Data App Frontend - React Offices page view component
 // M. Allen - 2019
 
 import React, { Component } from "react";
@@ -17,6 +17,7 @@ class Offices extends Component {
     this.handleCreateDocumentReset = this.handleCreateDocumentReset.bind(this);
   }
 
+  // Retrieving documents from Office collection in database
   getOfficeData() {
     axios.get(this.props.officeDataURL).then(res => {
       this.setState({
@@ -25,6 +26,7 @@ class Offices extends Component {
     });
   }
 
+  // Adding new document to Office collection in database
   handleSubmitAddOfficeRecord(event) {
     event.preventDefault();
     let formData = {
@@ -40,52 +42,55 @@ class Offices extends Component {
     axios
       .post(this.props.officeDataURL + "/add", formData)
       .then(response => {
-        console.log("Response:");
-        console.log(response);
         if (response.data.status === "Fail") {
+          // Add rejected because Office name is not unique
           formMessage.className = "modal-error";
         } else {
-          formMessage.className = "modal-success";
+          formMessage.className = "modal-success"; // Document added to database successfully
           document.getElementById("addOfficeButton").className += " btn-hide";
         }
-        formMessage.innerHTML = response.data.message;
+        formMessage.innerHTML = response.data.message; // Show success/fail message to user
       })
       .catch(error => {
-        console.log("Error");
-        console.log(error);
+        // Unexpected error occurred
+        formMessage.className = "modal-error";
+        formMessage.innerHTML =
+          "An unexpected error occurred. Please contact the system administrator. Error:" +
+          error;
       });
   }
 
+  // Tidy up when 'create document' modal closes
   handleCreateDocumentReset() {
-    // Tidy up when create document modal closes
     document.getElementById("addOfficeRecordForm").reset();
     document.getElementById("formMessage").innerHTML = "";
     document.getElementById("formMessage").className = "";
-    document.getElementById("addOfficeButton").className="btn btn-primary";
+    document.getElementById("addOfficeButton").className = "btn btn-primary";
   }
 
   componentDidMount() {
     this.getOfficeData();
+
     // Event handlers for modal forms
-    // New document form submit
     document
       .getElementById("addOfficeRecordForm")
       .addEventListener("submit", this.handleSubmitAddOfficeRecord);
-      // New socument form close
-      document.getElementById("createDocumentCloseButton").addEventListener("click", this.handleCreateDocumentReset);
+    document
+      .getElementById("createDocumentCloseButton")
+      .addEventListener("click", this.handleCreateDocumentReset); 
 
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
-      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let button = window.$(event.relatedTarget);   // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title");   // Extract info from data-* attributes
       let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+      modal.find(".modal-record-title").text(recordIdentifier);   // Update modal with record identifier
     });
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
-      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let button = window.$(event.relatedTarget);   // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title");   // Extract info from data-* attributes
       let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+      modal.find(".modal-record-title").text(recordIdentifier);   // Update modal with record identifier
     });
     window.$('[data-toggle="tooltip"]').tooltip();
   }
@@ -94,20 +99,20 @@ class Offices extends Component {
   }
 
   render() {
-    let officeCards = (
-      // Default data loading spinner
+      // Default 'data loading' spinner
+      let officeCards = (
       <div className="col-sm-12 text-center">
         <Loader
           type="Circles"
           color="#FFFFFF"
           height={150}
           width={150}
-          timeout={0} // Show until data loads
+          timeout={0}   // Show until data loads
         />
       </div>
     );
 
-    // Build cards to display when data recieved from DB
+    // Build cards when data recieved from DB
     if (Object.keys(this.state.data).length > 0) {
       officeCards = this.state.data.map(data => (
         <div className="col-sm-4" key={data.office}>
@@ -164,6 +169,8 @@ class Offices extends Component {
         </div>
       ));
     }
+
+    // Render view
     return (
       <div className="App-body App-offices pb-5">
         <div className="container App-content">
@@ -191,9 +198,9 @@ class Offices extends Component {
           <div className="row pb-1"></div>
         </div>
 
-        {/* --------- Create modals - in page popup boxes --------- */}
+        {/* --------- Create modals (in-page popup boxes) --------- */}
 
-        {/* Create record modal */}
+        {/* 'Create record' modal */}
         <div
           className="modal fade"
           id="createRecordModal"
@@ -218,6 +225,7 @@ class Offices extends Component {
                 </button>
               </div>
               <div className="modal-body">
+                {/* New record form */}
                 <form id="addOfficeRecordForm">
                   <div className="control-group">
                     <div className="form-group floating-label-form-group controls">
@@ -312,6 +320,7 @@ class Offices extends Component {
                       </select>
                     </div>
                   </div>
+                  {/* Success/error message */}
                   <div id="formMessage"></div>
                   <br />
                   <div className="form-group">
@@ -339,7 +348,8 @@ class Offices extends Component {
             </div>
           </div>
         </div>
-        {/* Update record modal */}
+
+        {/* 'Update record' modal */}
         <div
           className="modal fade"
           id="updateRecordModal"
@@ -384,7 +394,8 @@ class Offices extends Component {
             </div>
           </div>
         </div>
-        {/* Delete record modal */}
+
+        {/* 'Delete record' modal */}
         <div
           className="modal fade"
           id="deleteRecordModal"

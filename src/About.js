@@ -1,4 +1,4 @@
-// React About page content component
+// Company Data App Frontend - React About page content component
 // M. Allen - 2019
 
 import React, { Component } from "react";
