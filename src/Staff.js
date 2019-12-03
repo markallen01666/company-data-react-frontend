@@ -1,4 +1,4 @@
-// React Staff page content component
+// Company Data App Frontend - React Staff page content component
 // M. Allen - 2019
 
 import React, { Component } from "react";
@@ -11,11 +11,81 @@ class Services extends Component {
     this.state = {
       data: []
     };
+    this.handleSubmitAddEmployeeRecord = this.handleSubmitAddEmployeeRecord.bind(
+      this
+    );
+    this.handleCreateDocumentReset = this.handleCreateDocumentReset.bind(this);
+  }
+
+  // Retrieving documents from Employee collection in database
+  getEmployeeData() {
+    axios.get(this.props.employeeDataURL).then(res => {
+      this.setState({
+        data: res.data
+      });
+    });
+  }
+
+  // Adding new document to Office collection in database
+  handleSubmitAddEmployeeRecord(event) {
+    event.preventDefault();
+    let formData = {
+      staffId: document.getElementById("staffId").value,
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      office: document.getElementById("office").value,
+      position: document.getElementById("position").value,
+      telephone: document.getElementById("telephone").value,
+      email: document.getElementById("email").value,
+      adminLock: document.getElementById("adminLock").value
+    };
+    let formMessage = document.getElementById("formMessage");
+    axios
+      .post(this.props.employeeDataURL + "/add", formData)
+      .then(response => {
+        if (response.data.status === "Fail") {
+          // 'Add' was rejected because Employee ID is not unique
+          formMessage.className = "modal-error";
+        } else {
+          formMessage.className = "modal-success";    // Document added to database successfully
+          document.getElementById("addEmployeeButton").className += " btn-hide";
+          let stateHolder = this.state.data;
+          stateHolder.push(formData);
+          this.setState({
+            data: stateHolder   // Update current state with new record avoiding data reload
+          });
+        }
+        formMessage.innerHTML = response.data.message; // Show success/fail message to user
+      })
+      .catch(error => {
+        // Unexpected error occurred
+        formMessage.className = "modal-error";
+        formMessage.innerHTML =
+          "An unexpected error occurred. Please contact the system administrator. Error:" +
+          error;
+      });
+  }
+
+  // Tidy up when 'create document' modal closes
+  handleCreateDocumentReset() {
+    document.getElementById("addEmployeeRecordForm").reset();
+    document.getElementById("formMessage").innerHTML = "";
+    document.getElementById("formMessage").className = "";
+    document.getElementById("addEmployeeButton").className = "btn btn-primary";
   }
 
   componentDidMount() {
     this.getEmployeeData();
-    window.$('[data-toggle="tooltip"]').tooltip();
+
+    // Event handlers for modal forms
+    document
+      .getElementById("addEmployeeRecordForm")
+      .addEventListener("submit", this.handleSubmitAddEmployeeRecord);
+    document
+      .getElementById("createDocumentCloseButton")
+      .addEventListener("click", this.handleCreateDocumentReset); 
+
+    // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
       let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
@@ -28,38 +98,30 @@ class Services extends Component {
       let modal = window.$(this);
       modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
     });
-  }
-   
+    window.$('[data-toggle="tooltip"]').tooltip();
+  } 
   componentDidUpdate() {
     window.$('[data-toggle="tooltip"]').tooltip();
   }
 
-  getEmployeeData() {
-    axios.get(this.props.employeeDataURL).then(res => {
-      this.setState({
-        data: res.data
-      });
-    });
-  }
-
   render() {
-    let employeeCards = (
       // Default data loading spinner
+      let employeeCards = (
       <div className="col-sm-12 text-center">
         <Loader
           type="Circles"
           color="#FFFFFF"
           height={150}
           width={150}
-          timeout={0} // Show until data loads
+          timeout={0}   // Show until data loads
         />
       </div>
     );
 
-    // Handle rendering before DB response received
+    // Build cards when data recieved from DB
     if (Object.keys(this.state.data).length > 0) {
       employeeCards = this.state.data.map(data => (
-        <div className="col-sm-4" key={data.office}>
+        <div className="col-sm-4" key={data.staffId}>
           <div className="card card-spacing">
             <div className="card-body">
               <h5 className="card-title">
@@ -107,6 +169,8 @@ class Services extends Component {
         </div>
       ));
     }
+
+    // Render view
     return (
       <div className="App-body App-staff pb-5">
         <div className="container App-content">
@@ -129,15 +193,18 @@ class Services extends Component {
               </span>
             </div>
           </div>
-          {/* Inject cards built form records read */}
+          {/* Inject cards built from records read */}
           <div className="row padding-bottom-5vh">{employeeCards}</div>
           <div className="row pb-1"></div>
         </div>
-        {/* Create record modal */}
+
+        {/* --------- Create modals (in-page popup boxes) --------- */}
+
+        {/* 'Create record' modal */}
         <div
           className="modal fade"
           id="createRecordModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="createRecordModalLabel"
           aria-hidden="true"
@@ -146,7 +213,7 @@ class Services extends Component {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="createRecordModalLabel">
-                  Create a new Office record
+                  Create a new Employee record
                 </h5>
                 <button
                   type="button"
@@ -157,17 +224,137 @@ class Services extends Component {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">Enter your data here</div>
+              <div className="modal-body">
+                {/* New record form */}
+                <form id="addEmployeeRecordForm">
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="staff ID"
+                        id="staffId"
+                        name="staffId"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Staff ID must be unique"
+                        required
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="first name"
+                        id="firstName"
+                        name="firstName"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="last name"
+                        id="lastName"
+                        name="lastName"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="office"
+                        placeholder="office"
+                        id="office"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="position"
+                        placeholder="position"
+                        id="position"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="telephone"
+                        placeholder="telephone"
+                        id="telephone"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="email"
+                        placeholder="email"
+                        id="email"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <label>adminLock?</label>
+                      <select
+                        name="adminLock"
+                        id="adminLock"
+                        className="form-control"
+                        defaultValue="false"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Locked records can only be changed/deleted by the Administrator"
+                      >
+                        <option value="false">False</option>
+                        <option value="true">True</option>
+                      </select>
+                    </div>
+                  </div>
+                  {/* Success/error message */}
+                  <div id="formMessage"></div>
+                  <br />
+                  <div className="form-group">
+                    <button
+                      type="submit"
+                      value="submit"
+                      className="btn btn-primary"
+                      id="addEmployeeButton"
+                    >
+                      Add employee
+                    </button>
+                  </div>
+                </form>
+              </div>
               <div className="modal-footer">
                 <button
+                  id="createDocumentCloseButton"
                   type="button"
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
                   Close
-                </button>
-                <button type="button" className="btn btn-primary">
-                  Save changes
                 </button>
               </div>
             </div>
@@ -177,7 +364,7 @@ class Services extends Component {
         <div
           className="modal fade"
           id="updateRecordModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="updateRecordModalLabel"
           aria-hidden="true"
@@ -222,7 +409,7 @@ class Services extends Component {
         <div
           className="modal fade"
           id="deleteRecordModal"
-          tabindex="-1"
+          tabIndex="-1"
           role="dialog"
           aria-labelledby="deleterecordModalLabel"
           aria-hidden="true"

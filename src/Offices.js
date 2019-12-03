@@ -50,10 +50,8 @@ class Offices extends Component {
           document.getElementById("addOfficeButton").className += " btn-hide";
           let stateHolder = this.state.data;
           stateHolder.push(formData);
-          console.log("stateHolder:");
-          console.log(stateHolder);
           this.setState({
-            data: stateHolder   // Update current view
+            data: stateHolder   // Update current state with new record avoiding data reload
           });
         }
         formMessage.innerHTML = response.data.message; // Show success/fail message to user
@@ -120,7 +118,6 @@ class Offices extends Component {
     );
 
     // Build cards when data recieved from DB
-    console.log(this.state.data);
     if (Object.keys(this.state.data).length > 0) {
       officeCards = this.state.data.map(data => (
         <div className="col-sm-4" key={data.office}>
@@ -201,7 +198,7 @@ class Offices extends Component {
               </span>
             </div>
           </div>
-          {/* Inject cards built form records read */}
+          {/* Inject cards built from records read */}
           <div className="row padding-bottom-5vh">{officeCards}</div>
           <div className="row pb-1"></div>
         </div>
