@@ -43,11 +43,18 @@ class Offices extends Component {
       .post(this.props.officeDataURL + "/add", formData)
       .then(response => {
         if (response.data.status === "Fail") {
-          // Add rejected because Office name is not unique
+          // 'Add' was rejected because Office name is not unique
           formMessage.className = "modal-error";
         } else {
-          formMessage.className = "modal-success"; // Document added to database successfully
+          formMessage.className = "modal-success";    // Document added to database successfully
           document.getElementById("addOfficeButton").className += " btn-hide";
+          let stateHolder = this.state.data;
+          stateHolder.push(formData);
+          console.log("stateHolder:");
+          console.log(stateHolder);
+          this.setState({
+            data: stateHolder   // Update current view
+          });
         }
         formMessage.innerHTML = response.data.message; // Show success/fail message to user
       })
@@ -113,6 +120,7 @@ class Offices extends Component {
     );
 
     // Build cards when data recieved from DB
+    console.log(this.state.data);
     if (Object.keys(this.state.data).length > 0) {
       officeCards = this.state.data.map(data => (
         <div className="col-sm-4" key={data.office}>
