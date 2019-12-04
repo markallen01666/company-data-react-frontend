@@ -46,12 +46,12 @@ class Offices extends Component {
           // 'Add' was rejected because Office name is not unique
           formMessage.className = "modal-error";
         } else {
-          formMessage.className = "modal-success";    // Document added to database successfully
+          formMessage.className = "modal-success"; // Document added to database successfully
           document.getElementById("addOfficeButton").className += " btn-hide";
           let stateHolder = this.state.data;
           stateHolder.push(formData);
           this.setState({
-            data: stateHolder   // Update current state with new record avoiding data reload
+            data: stateHolder // Update current state with new record avoiding data reload
           });
         }
         formMessage.innerHTML = response.data.message; // Show success/fail message to user
@@ -82,20 +82,33 @@ class Offices extends Component {
       .addEventListener("submit", this.handleSubmitAddOfficeRecord);
     document
       .getElementById("createDocumentCloseButton")
-      .addEventListener("click", this.handleCreateDocumentReset); 
+      .addEventListener("click", this.handleCreateDocumentReset);
 
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
-      let button = window.$(event.relatedTarget);   // Button/Span that triggered the modal
-      let recordIdentifier = button.data("record-title");   // Extract info from data-* attributes
+      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
+      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
       let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier);   // Update modal with record identifier
+      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
     });
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
-      let button = window.$(event.relatedTarget);   // Button/Span that triggered the modal
-      let recordIdentifier = button.data("record-title");   // Extract info from data-* attributes
-      let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier);   // Update modal with record identifier
+      let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
+      // Extract info from data-* attributes and update modal with values to edit
+      document.getElementById("modal-update-office").value = button.data("record-office"); 
+      document.getElementById("modal-update-building").value = button.data("record-building");
+      document.getElementById("modal-update-number").value = button.data("record-number");
+      document.getElementById("modal-update-street").value = button.data("record-street");
+      document.getElementById("modal-update-town").value = button.data("record-town");
+      document.getElementById("modal-update-postcode").value = button.data("record-postcode");
+      document.getElementById("modal-update-adminLock").value = button.data("record-adminlock");
+      if (button.data("record-adminlock") === true) {
+        document.getElementById("updateformMessage").innerHTML = "Record is locked. Only Admin can change it!";
+        document.getElementById("updateformMessage").className = "modal-error";
+        document.getElementById("updateOfficeButton").className = "btn btn-hide";
+      }  else {
+        document.getElementById("updateformMessage").innerHTML = "";
+        document.getElementById("updateOfficeButton").className = "btn btn-primary";
+      }
     });
     window.$('[data-toggle="tooltip"]').tooltip();
   }
@@ -104,15 +117,15 @@ class Offices extends Component {
   }
 
   render() {
-      // Default 'data loading' spinner
-      let officeCards = (
+    // Default 'data loading' spinner
+    let officeCards = (
       <div className="col-sm-12 text-center">
         <Loader
           type="Circles"
           color="#FFFFFF"
           height={150}
           width={150}
-          timeout={0}   // Show until data loads
+          timeout={0} // Show until data loads
         />
       </div>
     );
@@ -142,7 +155,13 @@ class Offices extends Component {
               <span
                 data-toggle="modal"
                 data-target="#updateRecordModal"
-                data-record-title={data.office}
+                data-record-office={data.office}
+                data-record-building={data.building}
+                data-record-number={data.number}
+                data-record-street={data.street}
+                data-record-town={data.town}
+                data-record-postcode={data.postcode}
+                data-record-adminlock={data.adminLock}
               >
                 <button
                   type="button"
@@ -379,21 +398,123 @@ class Offices extends Component {
                 </button>
               </div>
               <div className="modal-body">
-                <strong>
-                  <h6 className="modal-record-title text-primary">Office</h6>
-                </strong>
-                <p>Enter your data here</p>
+                {/* Update record form */}
+                <form id="updateOfficeRecordForm">
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="modal-update-office"
+                        name="office"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Office names must be unique"
+                        required
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="building name"
+                        id="modal-update-building"
+                        name="building"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="street number"
+                        id="modal-update-number"
+                        name="number"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="street"
+                        placeholder="street name"
+                        id="modal-update-street"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="town"
+                        placeholder="town/city name"
+                        id="modal-update-town"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="postcode"
+                        placeholder="postcode"
+                        id="modal-update-postcode"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <label>adminLock?</label>
+                      <select
+                        name="adminLock"
+                        id="modal-update-adminLock"
+                        className="form-control"
+                        defaultValue="false"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Locked records can only be changed/deleted by the Administrator"
+                      >
+                        <option value="false">False</option>
+                        <option value="true">True</option>
+                      </select>
+                    </div>
+                  </div>
+                  {/* Success/error message */}
+                  <div id="updateformMessage"></div>
+                  <br />
+                  <div className="form-group">
+                    <button
+                      type="submit"
+                      value="submit"
+                      className="btn btn-primary"
+                      id="updateOfficeButton"
+                    >
+                      Update office
+                    </button>
+                  </div>
+                </form>
               </div>
               <div className="modal-footer">
                 <button
+                  id="updateDocumentCloseButton"
                   type="button"
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
                   Close
-                </button>
-                <button type="button" className="btn btn-primary">
-                  Save changes
                 </button>
               </div>
             </div>
@@ -429,7 +550,7 @@ class Offices extends Component {
               </div>
               <div className="modal-body">
                 <strong>
-                  <h6 className="modal-record-title text-primary">Office</h6>
+                  <h6 className="modal-record-title text-primary">Office Name</h6>
                 </strong>
                 <p>
                   You are about to delete this record. If you continue, this
