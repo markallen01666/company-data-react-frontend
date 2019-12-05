@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import Loader from "react-loader-spinner";
 
-class Services extends Component {
+class Staff extends Component {
   constructor() {
     super();
     this.state = {
@@ -14,7 +14,10 @@ class Services extends Component {
     this.handleSubmitAddEmployeeRecord = this.handleSubmitAddEmployeeRecord.bind(
       this
     );
-    this.handleCreateDocumentReset = this.handleCreateDocumentReset.bind(this);
+    this.handleSubmitUpdateEmployeeRecord = this.handleSubmitUpdateEmployeeRecord.bind(
+      this
+    );
+    this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
   }
 
   // Retrieving documents from Employee collection in database
@@ -26,7 +29,7 @@ class Services extends Component {
     });
   }
 
-  // Adding new document to Office collection in database
+  // Adding new document to Employee collection in database
   handleSubmitAddEmployeeRecord(event) {
     event.preventDefault();
     let formData = {
@@ -47,12 +50,12 @@ class Services extends Component {
           // 'Add' was rejected because Employee ID is not unique
           formMessage.className = "modal-error";
         } else {
-          formMessage.className = "modal-success";    // Document added to database successfully
+          formMessage.className = "modal-success"; // Document added to database successfully
           document.getElementById("addEmployeeButton").className += " btn-hide";
           let stateHolder = this.state.data;
           stateHolder.push(formData);
           this.setState({
-            data: stateHolder   // Update current state with new record avoiding data reload
+            data: stateHolder // Update current state with new record avoiding data reload
           });
         }
         formMessage.innerHTML = response.data.message; // Show success/fail message to user
@@ -61,17 +64,65 @@ class Services extends Component {
         // Unexpected error occurred
         formMessage.className = "modal-error";
         formMessage.innerHTML =
-          "An unexpected error occurred. Please contact the system administrator. Error:" +
+          "An unexpected error occurred. Please contact the system administrator. \nError = " +
           error;
       });
   }
 
-  // Tidy up when 'create document' modal closes
-  handleCreateDocumentReset() {
+  // Updating Employee document collection in database
+  handleSubmitUpdateEmployeeRecord(event) {
+    event.preventDefault();
+    let formData = {
+      staffId: document.getElementById("staffId").value,
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      office: document.getElementById("office").value,
+      position: document.getElementById("position").value,
+      telephone: document.getElementById("telephone").value,
+      email: document.getElementById("email").value,
+      adminLock: document.getElementById("modal-update-adminLock").value
+    };
+    let formMessage = document.getElementById("updateformMessage");
+    axios
+      .post(this.props.employeeeDataURL + "/update", formData)
+      .then(response => {
+        formMessage.className = "modal-success"; // Document updated successfully
+        document.getElementById("updateEmployeeButton").className +=
+          " btn-hide";
+        // Replace record info in state.data with updated version
+        let stateHolder = this.state.data;
+        let updateIndex = stateHolder.findIndex(
+          sh => sh.office === formData.staffId
+        );
+        formData._id = stateHolder[updateIndex]._id;
+        if (updateIndex !== -1) {
+          stateHolder[updateIndex] = formData;
+        }
+        this.setState({
+          data: stateHolder // Update current state with modified record avoiding data reload
+        });
+        formMessage.innerHTML = "Update completed"; // Show success/fail message to user
+      })
+      .catch(error => {
+        // Unexpected error occurred
+        formMessage.className = "modal-error";
+        formMessage.innerHTML =
+          "An unexpected error occurred. Please contact the system administrator. \nError = " +
+          error;
+      });
+  }
+
+  // Tidy up when modal closes
+  handleModalDocumentReset() {
     document.getElementById("addEmployeeRecordForm").reset();
     document.getElementById("formMessage").innerHTML = "";
     document.getElementById("formMessage").className = "";
     document.getElementById("addEmployeeButton").className = "btn btn-primary";
+    document.getElementById("updateEmployeeRecordForm").reset();
+    document.getElementById("updateformMessage").innerHTML = "";
+    document.getElementById("updateformMessage").className = "";
+    document.getElementById("updateEmployeeButton").className =
+      "btn btn-primary";
   }
 
   componentDidMount() {
@@ -82,8 +133,14 @@ class Services extends Component {
       .getElementById("addEmployeeRecordForm")
       .addEventListener("submit", this.handleSubmitAddEmployeeRecord);
     document
+      .getElementById("updateEmployeeRecordForm")
+      .addEventListener("submit", this.handleSubmitUpdateEmployeeRecord);
+    document
       .getElementById("createDocumentCloseButton")
-      .addEventListener("click", this.handleCreateDocumentReset); 
+      .addEventListener("click", this.handleModalDocumentReset);
+    document
+      .getElementById("updateDocumentCloseButton")
+      .addEventListener("click", this.handleModalDocumentReset);
 
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
@@ -94,27 +151,63 @@ class Services extends Component {
     });
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
-      let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+      // Extract info from data-* attributes and update modal with values to edit
+      document.getElementById("modal-update-staffId").value = button.data(
+        "record-staffid"
+      );
+      document.getElementById("modal-update-firstName").value = button.data(
+        "record-firstname"
+      );
+      document.getElementById("modal-update-lastName").value = button.data(
+        "record-lastname"
+      );
+      document.getElementById("modal-update-office").value = button.data(
+        "record-office"
+      );
+      document.getElementById("modal-update-position").value = button.data(
+        "record-position"
+      );
+      document.getElementById("modal-update-telephone").value = button.data(
+        "record-telephone"
+      );
+      document.getElementById("modal-update-email").value = button.data(
+        "record-email"
+      );
+
+      document.getElementById("modal-update-adminLock").value = button.data(
+        "record-adminlock"
+      );
+      if (button.data("record-adminlock") === true) {
+        document.getElementById("updateformMessage").innerHTML =
+          "Record is locked. Only Admin can change it!";
+        document.getElementById("updateformMessage").className = "modal-error";
+        document.getElementById("updateEmployeeButton").className =
+          "btn btn-hide";
+      } else {
+        document.getElementById("updateformMessage").innerHTML = "";
+        document.getElementById("updateEmployeeButton").className =
+          "btn btn-primary";
+      }
     });
     window.$('[data-toggle="tooltip"]').tooltip();
-  } 
+  }
   componentDidUpdate() {
     window.$('[data-toggle="tooltip"]').tooltip();
   }
 
   render() {
-      // Default data loading spinner
-      let employeeCards = (
+    // Default 'data loading' spinner
+    let employeeCards = (
       <div className="col-sm-12 text-center">
-        <Loader
-          type="Circles"
-          color="#FFFFFF"
-          height={150}
-          width={150}
-          timeout={0}   // Show until data loads
-        />
+        <div className="padding-top-10vh">
+          <Loader
+            type="Circles"
+            color="#FFFFFF"
+            height={150}
+            width={150}
+            timeout={0} // Show until data loads
+          />
+        </div>
       </div>
     );
 
@@ -127,17 +220,37 @@ class Services extends Component {
               <h5 className="card-title">
                 {data.firstName + " " + data.lastName}
               </h5>
-              <div className="card-text">{"Position: " + data.position}</div>
-              <div className="card-text">{"Office: " + data.office}</div>
-              <div className="card-text">{"ID: " + data.staffId}</div>
-              <div className="card-text">{"Telephone: " + data.telephone}</div>
-              <div className="card-text">{"Email: " + data.email}</div>
+              <div className="card-text">
+                {"Position: " +
+                  (data.position.length > 0 ? data.position : "---")}
+              </div>
+              <div className="card-text">
+                {"Office: " + (data.office.length > 0 ? data.office : "---")}
+              </div>
+              <div className="card-text">
+                {"ID: " + (data.staffId ? data.staffId : "---")}
+              </div>
+              <div className="card-text">
+                {"Telephone: " +
+                  (data.telephone ? data.telephone : "---")}
+              </div>
+              <div className="card-text">
+                {"Email: " + (data.email.length > 0 ? data.email : "---")}
+              </div>
+              <div className="card-text">{"adminLock: " + data.adminLock}</div>
             </div>
             <div className="row justify-content-center">
               <span
                 data-toggle="modal"
                 data-target="#updateRecordModal"
-                data-record-title={data.firstName + " " + data.lastName}
+                data-record-firstname={data.firstName}
+                data-record-lastname={data.lastName}
+                data-record-position={data.position}
+                data-record-office={data.office}
+                data-record-staffid={data.staffId}
+                data-record-telephone={data.telephone}
+                data-record-email={data.email}
+                data-record-adminlock={data.adminLock}
               >
                 <button
                   type="button"
@@ -360,7 +473,8 @@ class Services extends Component {
             </div>
           </div>
         </div>
-        {/* Update record modal */}
+
+        {/* Update 'record' modal */}
         <div
           className="modal fade"
           id="updateRecordModal"
@@ -373,7 +487,7 @@ class Services extends Component {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="updateRecordModalLabel">
-                  Edit Office record
+                  Edit employeeCards record
                 </h5>
                 <button
                   type="button"
@@ -385,27 +499,142 @@ class Services extends Component {
                 </button>
               </div>
               <div className="modal-body">
-                <strong>
-                  <h6 className="modal-record-title text-primary">Employee</h6>
-                </strong>
-                <p>Enter your data here</p>
+                {/* Update record form */}
+                <form id="updateEmployeeRecordForm">
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="modal-update-staffId"
+                        name="staffId"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Staff ID must be unique"
+                        disabled
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="first name"
+                        id="modal-update-firstName"
+                        name="firstName"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="last name"
+                        id="modal-update-lastName"
+                        name="lastName"
+                      />
+                      <p className="help-block text-danger"></p>
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="office"
+                        placeholder="office"
+                        id="modal-update-office"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="position"
+                        placeholder="position"
+                        id="modal-update-position"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="telephone"
+                        placeholder="telephone"
+                        id="modal-update-telephone"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="email"
+                        placeholder="email"
+                        id="modal-update-email"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="control-group">
+                    <div className="form-group floating-label-form-group controls">
+                      <label>adminLock?</label>
+                      <select
+                        name="adminLock"
+                        id="modal-update-adminLock"
+                        className="form-control"
+                        defaultValue="false"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Locked records can only be changed/deleted by the Administrator"
+                      >
+                        <option value="false">False</option>
+                        <option value="true">True</option>
+                      </select>
+                    </div>
+                  </div>
+                  {/* Success/error message */}
+                  <div id="updateformMessage"></div>
+                  <br />
+                  <div className="form-group">
+                    <button
+                      type="submit"
+                      value="submit"
+                      className="btn btn-primary"
+                      id="updateEmployeeButton"
+                    >
+                      Update employee
+                    </button>
+                  </div>
+                </form>
               </div>
               <div className="modal-footer">
                 <button
+                  id="updateDocumentCloseButton"
                   type="button"
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary">
-                  Save changes
-                </button>
               </div>
             </div>
           </div>
         </div>
-        {/* Delete record modal */}
+
+        {/* 'Delete record' modal */}
         <div
           className="modal fade"
           id="deleteRecordModal"
@@ -434,7 +663,9 @@ class Services extends Component {
               </div>
               <div className="modal-body">
                 <strong>
-                  <h6 className="modal-record-title text-primary">Employee</h6>
+                  <h6 className="modal-record-title text-primary">
+                    Employee
+                  </h6>
                 </strong>
                 <p>
                   You are about to delete this record. If you continue, this
@@ -465,4 +696,4 @@ class Services extends Component {
   }
 }
 
-export default Services;
+export default Staff;
