@@ -14,7 +14,10 @@ class Offices extends Component {
     this.handleSubmitAddOfficeRecord = this.handleSubmitAddOfficeRecord.bind(
       this
     );
-    this.handleCreateDocumentReset = this.handleCreateDocumentReset.bind(this);
+    this.handleSubmitUpdateOfficeRecord = this.handleSubmitUpdateOfficeRecord.bind(
+      this
+    );
+    this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
   }
 
   // Retrieving documents from Office collection in database
@@ -60,17 +63,62 @@ class Offices extends Component {
         // Unexpected error occurred
         formMessage.className = "modal-error";
         formMessage.innerHTML =
-          "An unexpected error occurred. Please contact the system administrator. Error:" +
+          "An unexpected error occurred. Please contact the system administrator. \nError = " +
           error;
       });
   }
 
-  // Tidy up when 'create document' modal closes
-  handleCreateDocumentReset() {
+  // Updating Office document collection in database
+  handleSubmitUpdateOfficeRecord(event) {
+    event.preventDefault();
+    let formData = {
+      office: document.getElementById("modal-update-office").value,
+      building: document.getElementById("modal-update-building").value,
+      number: document.getElementById("modal-update-number").value,
+      street: document.getElementById("modal-update-street").value,
+      town: document.getElementById("modal-update-town").value,
+      postcode: document.getElementById("modal-update-postcode").value,
+      adminLock: document.getElementById("modal-update-adminLock").value
+    };
+    let formMessage = document.getElementById("updateformMessage");
+    axios
+      .post(this.props.officeDataURL + "/update", formData)
+      .then(response => {
+        formMessage.className = "modal-success"; // Document updated successfully
+        document.getElementById("updateOfficeButton").className += " btn-hide";
+        // Replace record info in state.data with updated version
+        let stateHolder = this.state.data;
+        let updateIndex = stateHolder.findIndex(
+          sh => sh.office === formData.office
+        );
+        formData._id = stateHolder[updateIndex]._id;
+        if (updateIndex !== -1) {
+          stateHolder[updateIndex] = formData;
+        }
+        this.setState({
+          data: stateHolder // Update current state with modified record avoiding data reload
+        });
+        formMessage.innerHTML = "Update completed"; // Show success/fail message to user
+      })
+      .catch(error => {
+        // Unexpected error occurred
+        formMessage.className = "modal-error";
+        formMessage.innerHTML =
+          "An unexpected error occurred. Please contact the system administrator. \nError = " +
+          error;
+      });
+  }
+
+  // Tidy up when modal closes
+  handleModalDocumentReset() {
     document.getElementById("addOfficeRecordForm").reset();
     document.getElementById("formMessage").innerHTML = "";
     document.getElementById("formMessage").className = "";
     document.getElementById("addOfficeButton").className = "btn btn-primary";
+    document.getElementById("updateOfficeRecordForm").reset();
+    document.getElementById("updateformMessage").innerHTML = "";
+    document.getElementById("updateformMessage").className = "";
+    document.getElementById("updateOfficeButton").className = "btn btn-primary";
   }
 
   componentDidMount() {
@@ -81,8 +129,14 @@ class Offices extends Component {
       .getElementById("addOfficeRecordForm")
       .addEventListener("submit", this.handleSubmitAddOfficeRecord);
     document
+      .getElementById("updateOfficeRecordForm")
+      .addEventListener("submit", this.handleSubmitUpdateOfficeRecord);
+    document
       .getElementById("createDocumentCloseButton")
-      .addEventListener("click", this.handleCreateDocumentReset);
+      .addEventListener("click", this.handleModalDocumentReset);
+    document
+      .getElementById("updateDocumentCloseButton")
+      .addEventListener("click", this.handleModalDocumentReset);
 
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
@@ -94,20 +148,37 @@ class Offices extends Component {
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
       // Extract info from data-* attributes and update modal with values to edit
-      document.getElementById("modal-update-office").value = button.data("record-office"); 
-      document.getElementById("modal-update-building").value = button.data("record-building");
-      document.getElementById("modal-update-number").value = button.data("record-number");
-      document.getElementById("modal-update-street").value = button.data("record-street");
-      document.getElementById("modal-update-town").value = button.data("record-town");
-      document.getElementById("modal-update-postcode").value = button.data("record-postcode");
-      document.getElementById("modal-update-adminLock").value = button.data("record-adminlock");
+      document.getElementById("modal-update-office").value = button.data(
+        "record-office"
+      );
+      document.getElementById("modal-update-building").value = button.data(
+        "record-building"
+      );
+      document.getElementById("modal-update-number").value = button.data(
+        "record-number"
+      );
+      document.getElementById("modal-update-street").value = button.data(
+        "record-street"
+      );
+      document.getElementById("modal-update-town").value = button.data(
+        "record-town"
+      );
+      document.getElementById("modal-update-postcode").value = button.data(
+        "record-postcode"
+      );
+      document.getElementById("modal-update-adminLock").value = button.data(
+        "record-adminlock"
+      );
       if (button.data("record-adminlock") === true) {
-        document.getElementById("updateformMessage").innerHTML = "Record is locked. Only Admin can change it!";
+        document.getElementById("updateformMessage").innerHTML =
+          "Record is locked. Only Admin can change it!";
         document.getElementById("updateformMessage").className = "modal-error";
-        document.getElementById("updateOfficeButton").className = "btn btn-hide";
-      }  else {
+        document.getElementById("updateOfficeButton").className =
+          "btn btn-hide";
+      } else {
         document.getElementById("updateformMessage").innerHTML = "";
-        document.getElementById("updateOfficeButton").className = "btn btn-primary";
+        document.getElementById("updateOfficeButton").className =
+          "btn btn-primary";
       }
     });
     window.$('[data-toggle="tooltip"]').tooltip();
@@ -120,13 +191,15 @@ class Offices extends Component {
     // Default 'data loading' spinner
     let officeCards = (
       <div className="col-sm-12 text-center">
-        <Loader
-          type="Circles"
-          color="#FFFFFF"
-          height={150}
-          width={150}
-          timeout={0} // Show until data loads
-        />
+        <div className="padding-top-10vh">
+          <Loader
+            type="Circles"
+            color="#FFFFFF"
+            height={150}
+            width={150}
+            timeout={0} // Show until data loads
+          />
+        </div>
       </div>
     );
 
@@ -410,7 +483,7 @@ class Offices extends Component {
                         data-toggle="tooltip"
                         data-placement="top"
                         title="Office names must be unique"
-                        required
+                        disabled
                       />
                       <p className="help-block text-danger"></p>
                     </div>
@@ -550,7 +623,9 @@ class Offices extends Component {
               </div>
               <div className="modal-body">
                 <strong>
-                  <h6 className="modal-record-title text-primary">Office Name</h6>
+                  <h6 className="modal-record-title text-primary">
+                    Office Name
+                  </h6>
                 </strong>
                 <p>
                   You are about to delete this record. If you continue, this
