@@ -24,9 +24,21 @@ class Staff extends Component {
   getEmployeeData() {
     axios.get(this.props.employeeDataURL).then(res => {
       this.setState({
-        data: res.data
+        data: this.sortData(res.data)
       });
     });
+  }
+
+  // Sort data before presentation to user
+  sortData(data) {
+    // Use firstName and then lastName to give name sorted array
+    let dataSortedByName = data.sort((a, b) =>
+      a.firstName.localeCompare(b.firstName)
+    );
+    dataSortedByName = dataSortedByName.sort((a, b) =>
+      a.lastName.localeCompare(b.lastName)
+    );
+    return dataSortedByName;
   }
 
   // Adding new document to Employee collection in database
@@ -55,7 +67,7 @@ class Staff extends Component {
           let stateHolder = this.state.data;
           stateHolder.push(formData);
           this.setState({
-            data: stateHolder // Update current state with new record avoiding data reload
+            data: this.sortData(stateHolder) // Update current state with new record avoiding data reload
           });
         }
         formMessage.innerHTML = response.data.message; // Show success/fail message to user
@@ -73,33 +85,34 @@ class Staff extends Component {
   handleSubmitUpdateEmployeeRecord(event) {
     event.preventDefault();
     let formData = {
-      staffId: document.getElementById("staffId").value,
-      firstName: document.getElementById("firstName").value,
-      lastName: document.getElementById("lastName").value,
-      office: document.getElementById("office").value,
-      position: document.getElementById("position").value,
-      telephone: document.getElementById("telephone").value,
-      email: document.getElementById("email").value,
+      staffId: document.getElementById("modal-update-staffId").value,
+      firstName: document.getElementById("modal-update-firstName").value,
+      lastName: document.getElementById("modal-update-lastName").value,
+      office: document.getElementById("modal-update-office").value,
+      position: document.getElementById("modal-update-position").value,
+      telephone: document.getElementById("modal-update-telephone").value,
+      email: document.getElementById("modal-update-email").value,
       adminLock: document.getElementById("modal-update-adminLock").value
     };
     let formMessage = document.getElementById("updateformMessage");
     axios
-      .post(this.props.employeeeDataURL + "/update", formData)
+      .post(this.props.employeeDataURL + "/update", formData)
       .then(response => {
         formMessage.className = "modal-success"; // Document updated successfully
         document.getElementById("updateEmployeeButton").className +=
           " btn-hide";
+
         // Replace record info in state.data with updated version
         let stateHolder = this.state.data;
         let updateIndex = stateHolder.findIndex(
-          sh => sh.office === formData.staffId
+          sh => sh.staffId === formData.staffId
         );
         formData._id = stateHolder[updateIndex]._id;
         if (updateIndex !== -1) {
           stateHolder[updateIndex] = formData;
         }
         this.setState({
-          data: stateHolder // Update current state with modified record avoiding data reload
+          data: this.sortData(stateHolder) // Update current state with modified record avoiding data reload
         });
         formMessage.innerHTML = "Update completed"; // Show success/fail message to user
       })
@@ -231,8 +244,7 @@ class Staff extends Component {
                 {"ID: " + (data.staffId ? data.staffId : "---")}
               </div>
               <div className="card-text">
-                {"Telephone: " +
-                  (data.telephone ? data.telephone : "---")}
+                {"Telephone: " + (data.telephone ? data.telephone : "---")}
               </div>
               <div className="card-text">
                 {"Email: " + (data.email.length > 0 ? data.email : "---")}
@@ -487,7 +499,7 @@ class Staff extends Component {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="updateRecordModalLabel">
-                  Edit employeeCards record
+                  Edit employee record
                 </h5>
                 <button
                   type="button"
@@ -663,9 +675,7 @@ class Staff extends Component {
               </div>
               <div className="modal-body">
                 <strong>
-                  <h6 className="modal-record-title text-primary">
-                    Employee
-                  </h6>
+                  <h6 className="modal-record-title text-primary">Employee</h6>
                 </strong>
                 <p>
                   You are about to delete this record. If you continue, this

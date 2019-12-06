@@ -17,6 +17,9 @@ class Offices extends Component {
     this.handleSubmitUpdateOfficeRecord = this.handleSubmitUpdateOfficeRecord.bind(
       this
     );
+    this.handleDeleteOfficeRecord = this.handleDeleteOfficeRecord.bind(
+      this
+    );
     this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
   }
 
@@ -24,9 +27,16 @@ class Offices extends Component {
   getOfficeData() {
     axios.get(this.props.officeDataURL).then(res => {
       this.setState({
-        data: res.data
+        data: this.sortData(res.data)
       });
     });
+  }
+
+  // Sort data before presentation to user
+  sortData(data) {
+    // Use office name to give sorted array
+    let dataSortedByOffice = data.sort((a, b) => a.office.localeCompare(b.office)) // array sorted by office name
+    return dataSortedByOffice;
   }
 
   // Adding new document to Office collection in database
@@ -54,7 +64,7 @@ class Offices extends Component {
           let stateHolder = this.state.data;
           stateHolder.push(formData);
           this.setState({
-            data: stateHolder // Update current state with new record avoiding data reload
+            data: this.sortData(stateHolder) // Update current state with new record avoiding data reload
           });
         }
         formMessage.innerHTML = response.data.message; // Show success/fail message to user
@@ -96,7 +106,7 @@ class Offices extends Component {
           stateHolder[updateIndex] = formData;
         }
         this.setState({
-          data: stateHolder // Update current state with modified record avoiding data reload
+          data: this.sortData(stateHolder) // Update current state with modified record avoiding data reload
         });
         formMessage.innerHTML = "Update completed"; // Show success/fail message to user
       })
@@ -109,6 +119,41 @@ class Offices extends Component {
       });
   }
 
+  // Delete office record
+  handleDeleteOfficeRecord(event) {
+    event.preventDefault();
+    let formData = {
+      _id: ""
+    }
+    let formMessage = document.getElementById("deleteformMessage");
+    axios
+    .post(this.props.officeDataURL + "/delete", formData)
+    .then(response => {
+      formMessage.className = "modal-success"; // Document updated successfully
+      document.getElementById("deleteOfficeButton").className += " btn-hide";
+      // Remove record info from state.data
+      let stateHolder = this.state.data;
+      let updateIndex = stateHolder.findIndex(
+        sh => sh.office === formData.office
+      );
+      if (updateIndex !== -1) {
+        stateHolder.splice(updateIndex, 1);
+      }
+      this.setState({
+        data: this.sortData(stateHolder) // Update current state with modified state avoiding data reload
+      });
+      formMessage.innerHTML = "Delete completed"; // Show success/fail message to user
+    })
+    .catch(error => {
+      // Unexpected error occurred
+      formMessage.className = "modal-error";
+      formMessage.innerHTML =
+        "An unexpected error occurred. Please contact the system administrator. \nError = " +
+        error;
+    });
+
+  }
+
   // Tidy up when modal closes
   handleModalDocumentReset() {
     document.getElementById("addOfficeRecordForm").reset();
@@ -119,6 +164,7 @@ class Offices extends Component {
     document.getElementById("updateformMessage").innerHTML = "";
     document.getElementById("updateformMessage").className = "";
     document.getElementById("updateOfficeButton").className = "btn btn-primary";
+    document.getElementById("deleteOfficeButton").className = "btn btn-primary";
   }
 
   componentDidMount() {
@@ -621,7 +667,7 @@ class Offices extends Component {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">
+              <div id="modal-delete-text" className="modal-body">
                 <strong>
                   <h6 className="modal-record-title text-primary">
                     Office Name
@@ -636,6 +682,8 @@ class Offices extends Component {
                   Are you sure you want to continue?
                 </h6>
               </div>
+              {/* Success/error message */}
+              <div id="deleteformMessage"></div>
               <div className="modal-footer">
                 <button
                   type="button"
@@ -644,7 +692,9 @@ class Offices extends Component {
                 >
                   Cancel
                 </button>
-                <button type="button" className="btn btn-danger">
+                <button type="button" 
+                id="deleteOfficeButton"
+                className="btn btn-danger">
                   Delete record
                 </button>
               </div>
