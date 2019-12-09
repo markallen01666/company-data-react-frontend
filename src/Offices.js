@@ -17,9 +17,7 @@ class Offices extends Component {
     this.handleSubmitUpdateOfficeRecord = this.handleSubmitUpdateOfficeRecord.bind(
       this
     );
-    this.handleDeleteOfficeRecord = this.handleDeleteOfficeRecord.bind(
-      this
-    );
+    this.handleDeleteOfficeRecord = this.handleDeleteOfficeRecord.bind(this);
     this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
   }
 
@@ -35,7 +33,9 @@ class Offices extends Component {
   // Sort data before presentation to user
   sortData(data) {
     // Use office name to give sorted array
-    let dataSortedByOffice = data.sort((a, b) => a.office.localeCompare(b.office)) // array sorted by office name
+    let dataSortedByOffice = data.sort((a, b) =>
+      a.office.localeCompare(b.office)
+    ); // array sorted by office name
     return dataSortedByOffice;
   }
 
@@ -122,36 +122,38 @@ class Offices extends Component {
   // Delete office record
   handleDeleteOfficeRecord(event) {
     event.preventDefault();
+    console.log("Delete button pressed");
+
     let formData = {
-      _id: ""
-    }
+      office: document.getElementById("modal-delete-office").value
+    };
+    console.log(formData);
     let formMessage = document.getElementById("deleteformMessage");
     axios
-    .post(this.props.officeDataURL + "/delete", formData)
-    .then(response => {
-      formMessage.className = "modal-success"; // Document updated successfully
-      document.getElementById("deleteOfficeButton").className += " btn-hide";
-      // Remove record info from state.data
-      let stateHolder = this.state.data;
-      let updateIndex = stateHolder.findIndex(
-        sh => sh.office === formData.office
-      );
-      if (updateIndex !== -1) {
-        stateHolder.splice(updateIndex, 1);
-      }
-      this.setState({
-        data: this.sortData(stateHolder) // Update current state with modified state avoiding data reload
+      .post(this.props.officeDataURL + "/delete", formData)
+      .then(response => {
+        formMessage.className = "modal-success"; // Document deleted successfully
+        document.getElementById("deleteOfficeButton").className += " btn-hide";
+        // Remove record info from state.data
+        let stateHolder = this.state.data;
+        let updateIndex = stateHolder.findIndex(
+          sh => sh.office === formData.office
+        );
+        if (updateIndex !== -1) {
+          stateHolder.splice(updateIndex, 1);
+        }
+        this.setState({
+          data: this.sortData(stateHolder) // Update current state with modified state avoiding data reload
+        });
+        formMessage.innerHTML = "Delete completed"; // Show success/fail message to user
+      })
+      .catch(error => {
+        // Unexpected error occurred
+        formMessage.className = "modal-error";
+        formMessage.innerHTML =
+          "An unexpected error occurred. Please contact the system administrator. \nError = " +
+          error;
       });
-      formMessage.innerHTML = "Delete completed"; // Show success/fail message to user
-    })
-    .catch(error => {
-      // Unexpected error occurred
-      formMessage.className = "modal-error";
-      formMessage.innerHTML =
-        "An unexpected error occurred. Please contact the system administrator. \nError = " +
-        error;
-    });
-
   }
 
   // Tidy up when modal closes
@@ -164,7 +166,8 @@ class Offices extends Component {
     document.getElementById("updateformMessage").innerHTML = "";
     document.getElementById("updateformMessage").className = "";
     document.getElementById("updateOfficeButton").className = "btn btn-primary";
-    document.getElementById("deleteOfficeButton").className = "btn btn-primary";
+    document.getElementById("deleteOfficeButton").className = "btn btn-danger";
+    document.getElementById("deleteformMessage").innerHTML = "";
   }
 
   componentDidMount() {
@@ -177,19 +180,28 @@ class Offices extends Component {
     document
       .getElementById("updateOfficeRecordForm")
       .addEventListener("submit", this.handleSubmitUpdateOfficeRecord);
+
+    document
+      .getElementById("modal-delete-span")
+      .addEventListener("click", this.handleDeleteOfficeRecord);
     document
       .getElementById("createDocumentCloseButton")
       .addEventListener("click", this.handleModalDocumentReset);
     document
       .getElementById("updateDocumentCloseButton")
       .addEventListener("click", this.handleModalDocumentReset);
+    document
+      .getElementById("deleteDocumentCloseButton")
+      .addEventListener("click", this.handleModalDocumentReset);
 
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
-      let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+      console.log("Value");
+      console.log(document.getElementById("modal-delete-office").value);
+      document.getElementById("modal-delete-office").value = button.data(
+        "record-office"
+      ); // Update modal with record identifier
     });
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
@@ -281,6 +293,7 @@ class Offices extends Component {
                 data-record-town={data.town}
                 data-record-postcode={data.postcode}
                 data-record-adminlock={data.adminLock}
+                data-record-id={data.id}
               >
                 <button
                   type="button"
@@ -668,11 +681,16 @@ class Offices extends Component {
                 </button>
               </div>
               <div id="modal-delete-text" className="modal-body">
-                <strong>
-                  <h6 className="modal-record-title text-primary">
-                    Office Name
-                  </h6>
-                </strong>
+                <span id="modal-delete-span">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="modal-delete-office"
+                    value="holder"
+                    name="office"
+                    disabled
+                  />
+                </span>
                 <p>
                   You are about to delete this record. If you continue, this
                   information will be permanently deleted and cannot be
@@ -681,20 +699,23 @@ class Offices extends Component {
                 <h6 className="text-danger">
                   Are you sure you want to continue?
                 </h6>
+                {/* Success/error message */}
+                <div id="deleteformMessage"></div>
               </div>
-              {/* Success/error message */}
-              <div id="deleteformMessage"></div>
               <div className="modal-footer">
                 <button
                   type="button"
+                  id="deleteDocumentCloseButton"
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
                   Cancel
                 </button>
-                <button type="button" 
-                id="deleteOfficeButton"
-                className="btn btn-danger">
+                <button
+                  type="button"
+                  id="deleteOfficeButton"
+                  className="btn btn-danger"
+                >
                   Delete record
                 </button>
               </div>
