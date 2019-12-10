@@ -17,6 +17,7 @@ class Staff extends Component {
     this.handleSubmitUpdateEmployeeRecord = this.handleSubmitUpdateEmployeeRecord.bind(
       this
     );
+    this.handleDeleteEmployeeRecord = this.handleDeleteEmployeeRecord.bind(this);
     this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
   }
 
@@ -125,6 +126,41 @@ class Staff extends Component {
       });
   }
 
+  // Delete employee record
+  handleDeleteEmployeeRecord(event) {
+    event.preventDefault();
+    let formData = {
+      staffId: document.getElementById("delete-staffId").innerHTML
+    };
+    let formMessage = document.getElementById("deleteformMessage");
+    axios
+      .post(this.props.employeeDataURL + "/delete", formData)
+      .then(response => {
+        formMessage.className = "modal-success"; // Document deleted successfully
+        document.getElementById("deleteEmployeeButton").className +=
+          " btn-hide";
+        // Remove record info from state.data
+        let stateHolder = this.state.data;
+        let updateIndex = stateHolder.findIndex(
+          sh => sh.staffId === formData.staffId
+        );
+        if (updateIndex !== -1) {
+          stateHolder.splice(updateIndex, 1);
+        }
+        this.setState({
+          data: this.sortData(stateHolder) // Update current state with modified state avoiding data reload
+        });
+        formMessage.innerHTML = "Delete completed"; // Show success/fail message to user
+      })
+      .catch(error => {
+        // Unexpected error occurred
+        formMessage.className = "modal-error";
+        formMessage.innerHTML =
+          "An unexpected error occurred. Please contact the system administrator. \nError = " +
+          error;
+      });
+  }
+
   // Tidy up when modal closes
   handleModalDocumentReset() {
     document.getElementById("addEmployeeRecordForm").reset();
@@ -136,6 +172,9 @@ class Staff extends Component {
     document.getElementById("updateformMessage").className = "";
     document.getElementById("updateEmployeeButton").className =
       "btn btn-primary";
+    document.getElementById("deleteEmployeeButton").className =
+      "btn btn-danger";
+    document.getElementById("deleteformMessage").innerHTML = "";
   }
 
   componentDidMount() {
@@ -149,18 +188,44 @@ class Staff extends Component {
       .getElementById("updateEmployeeRecordForm")
       .addEventListener("submit", this.handleSubmitUpdateEmployeeRecord);
     document
+      .getElementById("deleteEmployeeButton")
+      .addEventListener("click", this.handleDeleteEmployeeRecord);
+    document
       .getElementById("createDocumentCloseButton")
       .addEventListener("click", this.handleModalDocumentReset);
     document
       .getElementById("updateDocumentCloseButton")
+      .addEventListener("click", this.handleModalDocumentReset);
+    document
+      .getElementById("deleteDocumentCloseButton")
       .addEventListener("click", this.handleModalDocumentReset);
 
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
       let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let recordStaffId = button.data("record-staffid");
       let modal = window.$(this);
-      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+      modal.find(".modal-record-title").text(recordIdentifier); // Update modal
+      document.getElementById("delete-staffId").innerHTML = recordStaffId;
+      // Lock delete if adminLock is true
+      if (button.data("record-adminlock") === true) {
+        document.getElementById("deleteformMessage").innerHTML =
+          "This record is locked. Only the Admin can change it!";
+        document.getElementById("delete-warning-confirm").innerHTML =
+          "DELETE FORBIDDEN!";
+        document.getElementById("deleteformMessage").className = "modal-error";
+        document.getElementById("deleteEmployeeButton").className =
+          "btn btn-hide";
+      } else {
+        document.getElementById("deleteformMessage").innerHTML = "";
+        document.getElementById("delete-warning-text").innerHTML =
+          "You are about to delete this record. If you continue, this information will be permanently deleted and cannot be recovered.";
+        document.getElementById("delete-warning-confirm").innerHTML =
+          "Are you sure you want to continue?";
+        document.getElementById("deleteEmployeeButton").className =
+          "btn btn-danger";
+      }
     });
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
@@ -278,6 +343,8 @@ class Staff extends Component {
                 data-toggle="modal"
                 data-target="#deleteRecordModal"
                 data-record-title={data.firstName + " " + data.lastName}
+                data-record-staffid={data.staffId}
+                data-record-adminlock={data.adminLock}
               >
                 <button
                   type="button"
@@ -673,28 +740,40 @@ class Staff extends Component {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">
+              <div id="modal-delete-text" className="modal-body">
                 <strong>
-                  <h6 className="modal-record-title text-primary">Employee</h6>
-                </strong>
-                <p>
-                  You are about to delete this record. If you continue, this
-                  information will be permanently deleted and cannot be
-                  recovered.
-                </p>
-                <h6 className="text-danger">
-                  Are you sure you want to continue?
+                <h6
+                    id="delete-employee-name"
+                    className="modal-record-title text-primary"
+                  >
+                    Employee
                 </h6>
+                <h6
+                    id="delete-staffId"
+                    className="modal-record-staffId text-primary"
+                  >
+                    ID
+                </h6>
+                </strong>
+                <p id="delete-warning-text"></p>
+                <h6 className="text-danger" id="delete-warning-confirm">Confirm</h6>
+                {/* Success/error message */}
+                <div id="deleteformMessage"></div>
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
+                  id="deleteDocumentCloseButton"
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
-                  Cancel
+                  Close
                 </button>
-                <button type="button" className="btn btn-danger">
+                <button
+                  type="button"
+                  id="deleteEmployeeButton"
+                  className="btn btn-danger"
+                >
                   Delete record
                 </button>
               </div>

@@ -122,12 +122,9 @@ class Offices extends Component {
   // Delete office record
   handleDeleteOfficeRecord(event) {
     event.preventDefault();
-    console.log("Delete button pressed");
-
     let formData = {
-      office: document.getElementById("modal-delete-office").value
+      office: document.getElementById("delete-office-name").innerHTML
     };
-    console.log(formData);
     let formMessage = document.getElementById("deleteformMessage");
     axios
       .post(this.props.officeDataURL + "/delete", formData)
@@ -173,16 +170,15 @@ class Offices extends Component {
   componentDidMount() {
     this.getOfficeData();
 
-    // Event handlers for modal forms
+    // Event handlers for modals
     document
       .getElementById("addOfficeRecordForm")
       .addEventListener("submit", this.handleSubmitAddOfficeRecord);
     document
       .getElementById("updateOfficeRecordForm")
       .addEventListener("submit", this.handleSubmitUpdateOfficeRecord);
-
     document
-      .getElementById("modal-delete-span")
+      .getElementById("deleteOfficeButton")
       .addEventListener("click", this.handleDeleteOfficeRecord);
     document
       .getElementById("createDocumentCloseButton")
@@ -197,11 +193,27 @@ class Offices extends Component {
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
-      console.log("Value");
-      console.log(document.getElementById("modal-delete-office").value);
-      document.getElementById("modal-delete-office").value = button.data(
-        "record-office"
-      ); // Update modal with record identifier
+      let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
+      let modal = window.$(this);
+      modal.find(".modal-record-title").text(recordIdentifier); // Update modal with record identifier
+      // Lock delete if adminLock is true
+      if (button.data("record-adminlock") === true) {
+        document.getElementById("deleteformMessage").innerHTML =
+          "This record is locked. Only the Admin can change it!";
+        document.getElementById("delete-warning-confirm").innerHTML =
+          "DELETE FORBIDDEN!";
+        document.getElementById("deleteformMessage").className = "modal-error";
+        document.getElementById("deleteOfficeButton").className =
+          "btn btn-hide";
+      } else {
+        document.getElementById("deleteformMessage").innerHTML = "";
+        document.getElementById("delete-warning-text").innerHTML =
+          "You are about to delete this record. If you continue, this information will be permanently deleted and cannot be recovered.";
+        document.getElementById("delete-warning-confirm").innerHTML =
+          "Are you sure you want to continue?";
+        document.getElementById("deleteOfficeButton").className =
+          "btn btn-danger";
+      }
     });
     window.$("#updateRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
@@ -309,6 +321,7 @@ class Offices extends Component {
                 data-toggle="modal"
                 data-target="#deleteRecordModal"
                 data-record-title={data.office}
+                data-record-adminlock={data.adminLock}
               >
                 <button
                   type="button"
@@ -681,24 +694,16 @@ class Offices extends Component {
                 </button>
               </div>
               <div id="modal-delete-text" className="modal-body">
-                <span id="modal-delete-span">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="modal-delete-office"
-                    value="holder"
-                    name="office"
-                    disabled
-                  />
-                </span>
-                <p>
-                  You are about to delete this record. If you continue, this
-                  information will be permanently deleted and cannot be
-                  recovered.
-                </p>
-                <h6 className="text-danger">
-                  Are you sure you want to continue?
-                </h6>
+                <strong>
+                  <h6
+                    id="delete-office-name"
+                    className="modal-record-title text-primary"
+                  >
+                    Office
+                  </h6>
+                </strong>
+                <p id="delete-warning-text"></p>
+                <h6 className="text-danger" id="delete-warning-confirm">Confirm</h6>
                 {/* Success/error message */}
                 <div id="deleteformMessage"></div>
               </div>
@@ -709,7 +714,7 @@ class Offices extends Component {
                   className="btn btn-secondary"
                   data-dismiss="modal"
                 >
-                  Cancel
+                  Close
                 </button>
                 <button
                   type="button"
