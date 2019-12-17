@@ -22,7 +22,7 @@ Validation on entry/update fields - e.g. valid telephone numbers, staff ID codes
 - Delete validation - you cannot delete an office while an employee is still based there
 - User login
 - Admin login allowing changes ot adminLocked records
-- Add contry field for offices
+- Add country field for offices
 - Data validation based on country - e.g. ZIP code format for staff in US offices
 
 After this my plan is to recreate the front end using Angular and Vue to refresh my Vue skills and to learn Angular
