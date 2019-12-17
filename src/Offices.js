@@ -60,7 +60,7 @@ class Offices extends Component {
           formMessage.className = "modal-error";
         } else {
           formMessage.className = "modal-success"; // Document added to database successfully
-          document.getElementById("addOfficeButton").className += " btn-hide";
+          document.getElementById("addOfficeButton").className += " hide";
           let stateHolder = this.state.data;
           stateHolder.push(formData);
           this.setState({
@@ -95,7 +95,7 @@ class Offices extends Component {
       .post(this.props.officeDataURL + "/update", formData)
       .then(response => {
         formMessage.className = "modal-success"; // Document updated successfully
-        document.getElementById("updateOfficeButton").className += " btn-hide";
+        document.getElementById("updateOfficeButton").className += " hide";
         // Replace record info in state.data with updated version
         let stateHolder = this.state.data;
         let updateIndex = stateHolder.findIndex(
@@ -130,7 +130,7 @@ class Offices extends Component {
       .post(this.props.officeDataURL + "/delete", formData)
       .then(response => {
         formMessage.className = "modal-success"; // Document deleted successfully
-        document.getElementById("deleteOfficeButton").className += " btn-hide";
+        document.getElementById("deleteOfficeButton").className += " hide";
         // Remove record info from state.data
         let stateHolder = this.state.data;
         let updateIndex = stateHolder.findIndex(
@@ -204,7 +204,7 @@ class Offices extends Component {
           "DELETE FORBIDDEN!";
         document.getElementById("deleteformMessage").className = "modal-error";
         document.getElementById("deleteOfficeButton").className =
-          "btn btn-hide";
+          "btn hide";
       } else {
         document.getElementById("deleteformMessage").innerHTML = "";
         document.getElementById("delete-warning-text").innerHTML =
@@ -244,7 +244,7 @@ class Offices extends Component {
           "Record is locked. Only Admin can change it!";
         document.getElementById("updateformMessage").className = "modal-error";
         document.getElementById("updateOfficeButton").className =
-          "btn btn-hide";
+          "btn hide";
       } else {
         document.getElementById("updateformMessage").innerHTML = "";
         document.getElementById("updateOfficeButton").className =
@@ -292,7 +292,7 @@ class Offices extends Component {
               </div>
               <div className="card-text">{"City: " + data.town}</div>
               <div className="card-text">{"Postcode: " + data.postcode}</div>
-              <div className="card-text">{"adminLock: " + data.adminLock}</div>
+              <div className="card-text hide">{"adminLock: " + data.adminLock}</div>
             </div>
             <div className="row justify-content-center">
               <span

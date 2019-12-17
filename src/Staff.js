@@ -64,7 +64,7 @@ class Staff extends Component {
           formMessage.className = "modal-error";
         } else {
           formMessage.className = "modal-success"; // Document added to database successfully
-          document.getElementById("addEmployeeButton").className += " btn-hide";
+          document.getElementById("addEmployeeButton").className += " hide";
           let stateHolder = this.state.data;
           stateHolder.push(formData);
           this.setState({
@@ -101,7 +101,7 @@ class Staff extends Component {
       .then(response => {
         formMessage.className = "modal-success"; // Document updated successfully
         document.getElementById("updateEmployeeButton").className +=
-          " btn-hide";
+          " hide";
 
         // Replace record info in state.data with updated version
         let stateHolder = this.state.data;
@@ -138,7 +138,7 @@ class Staff extends Component {
       .then(response => {
         formMessage.className = "modal-success"; // Document deleted successfully
         document.getElementById("deleteEmployeeButton").className +=
-          " btn-hide";
+          " hide";
         // Remove record info from state.data
         let stateHolder = this.state.data;
         let updateIndex = stateHolder.findIndex(
@@ -216,7 +216,7 @@ class Staff extends Component {
           "DELETE FORBIDDEN!";
         document.getElementById("deleteformMessage").className = "modal-error";
         document.getElementById("deleteEmployeeButton").className =
-          "btn btn-hide";
+          "btn hide";
       } else {
         document.getElementById("deleteformMessage").innerHTML = "";
         document.getElementById("delete-warning-text").innerHTML =
@@ -260,7 +260,7 @@ class Staff extends Component {
           "Record is locked. Only Admin can change it!";
         document.getElementById("updateformMessage").className = "modal-error";
         document.getElementById("updateEmployeeButton").className =
-          "btn btn-hide";
+          "btn hide";
       } else {
         document.getElementById("updateformMessage").innerHTML = "";
         document.getElementById("updateEmployeeButton").className =
@@ -314,7 +314,7 @@ class Staff extends Component {
               <div className="card-text">
                 {"Email: " + (data.email.length > 0 ? data.email : "---")}
               </div>
-              <div className="card-text">{"adminLock: " + data.adminLock}</div>
+              <div className="card-text hide">{"adminLock: " + data.adminLock}</div>
             </div>
             <div className="row justify-content-center">
               <span
