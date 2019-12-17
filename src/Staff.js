@@ -17,8 +17,9 @@ class Staff extends Component {
     this.handleSubmitUpdateEmployeeRecord = this.handleSubmitUpdateEmployeeRecord.bind(
       this
     );
-    this.handleDeleteEmployeeRecord = this.handleDeleteEmployeeRecord.bind(this);
-    this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
+    this.handleDeleteEmployeeRecord = this.handleDeleteEmployeeRecord.bind(
+      this
+    );
   }
 
   // Retrieving documents from Employee collection in database
@@ -100,8 +101,7 @@ class Staff extends Component {
       .post(this.props.employeeDataURL + "/update", formData)
       .then(response => {
         formMessage.className = "modal-success"; // Document updated successfully
-        document.getElementById("updateEmployeeButton").className +=
-          " hide";
+        document.getElementById("updateEmployeeButton").className += " hide";
 
         // Replace record info in state.data with updated version
         let stateHolder = this.state.data;
@@ -137,8 +137,7 @@ class Staff extends Component {
       .post(this.props.employeeDataURL + "/delete", formData)
       .then(response => {
         formMessage.className = "modal-success"; // Document deleted successfully
-        document.getElementById("deleteEmployeeButton").className +=
-          " hide";
+        document.getElementById("deleteEmployeeButton").className += " hide";
         // Remove record info from state.data
         let stateHolder = this.state.data;
         let updateIndex = stateHolder.findIndex(
@@ -161,26 +160,10 @@ class Staff extends Component {
       });
   }
 
-  // Tidy up when modal closes
-  handleModalDocumentReset() {
-    document.getElementById("addEmployeeRecordForm").reset();
-    document.getElementById("formMessage").innerHTML = "";
-    document.getElementById("formMessage").className = "";
-    document.getElementById("addEmployeeButton").className = "btn btn-primary";
-    document.getElementById("updateEmployeeRecordForm").reset();
-    document.getElementById("updateformMessage").innerHTML = "";
-    document.getElementById("updateformMessage").className = "";
-    document.getElementById("updateEmployeeButton").className =
-      "btn btn-primary";
-    document.getElementById("deleteEmployeeButton").className =
-      "btn btn-danger";
-    document.getElementById("deleteformMessage").innerHTML = "";
-  }
-
   componentDidMount() {
     this.getEmployeeData();
 
-    // Event handlers for modal forms
+    // Event handlers for modals
     document
       .getElementById("addEmployeeRecordForm")
       .addEventListener("submit", this.handleSubmitAddEmployeeRecord);
@@ -190,17 +173,36 @@ class Staff extends Component {
     document
       .getElementById("deleteEmployeeButton")
       .addEventListener("click", this.handleDeleteEmployeeRecord);
-    document
-      .getElementById("createDocumentCloseButton")
-      .addEventListener("click", this.handleModalDocumentReset);
-    document
-      .getElementById("updateDocumentCloseButton")
-      .addEventListener("click", this.handleModalDocumentReset);
-    document
-      .getElementById("deleteDocumentCloseButton")
-      .addEventListener("click", this.handleModalDocumentReset);
 
-    // Inject card specific information into 'change' and 'delete' modals
+    // Tidy up when modal closes
+    window.$("#createRecordModal").on("hide.bs.modal", function(event) {
+      document.getElementById("addEmployeeRecordForm").reset();
+      document.getElementById("formMessage").innerHTML = "";
+      document.getElementById("formMessage").className = "";
+      document.getElementById("addEmployeeButton").className =
+        "btn btn-primary";
+    });
+    window.$("#deleteRecordModal").on("hide.bs.modal", function(event) {
+      document.getElementById("deleteEmployeeButton").className =
+        "btn btn-danger";
+      document.getElementById("deleteformMessage").innerHTML = "";
+    });
+    window.$("#updateRecordModal").on("hide.bs.modal", function(event) {
+      document.getElementById("updateEmployeeRecordForm").reset();
+      document.getElementById("updateformMessage").innerHTML = "";
+      document.getElementById("updateformMessage").className = "";
+      document.getElementById("updateEmployeeButton").className =
+        "btn btn-primary";
+      // clear adminLocked fields on update modal
+      document.getElementById("modal-update-firstName").disabled = false;
+      document.getElementById("modal-update-lastName").disabled = false;
+      document.getElementById("modal-update-office").disabled = false;
+      document.getElementById("modal-update-position").disabled = false;
+      document.getElementById("modal-update-telephone").disabled = false;
+      document.getElementById("modal-update-email").disabled = false;
+      document.getElementById("modal-update-adminLock").disabled = false;
+    });
+    // Inject card specific information into 'change' and 'delete' modals when they open
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
       let recordIdentifier = button.data("record-title"); // Extract info from data-* attributes
@@ -215,8 +217,7 @@ class Staff extends Component {
         document.getElementById("delete-warning-confirm").innerHTML =
           "DELETE FORBIDDEN!";
         document.getElementById("deleteformMessage").className = "modal-error";
-        document.getElementById("deleteEmployeeButton").className =
-          "btn hide";
+        document.getElementById("deleteEmployeeButton").className = "btn hide";
       } else {
         document.getElementById("deleteformMessage").innerHTML = "";
         document.getElementById("delete-warning-text").innerHTML =
@@ -256,11 +257,18 @@ class Staff extends Component {
         "record-adminlock"
       );
       if (button.data("record-adminlock") === true) {
+        // for updates, grey out all fields on adminLock === true
+        document.getElementById("modal-update-firstName").disabled = true;
+        document.getElementById("modal-update-lastName").disabled = true;
+        document.getElementById("modal-update-office").disabled = true;
+        document.getElementById("modal-update-position").disabled = true;
+        document.getElementById("modal-update-telephone").disabled = true;
+        document.getElementById("modal-update-email").disabled = true;
+        document.getElementById("modal-update-adminLock").disabled = true;
         document.getElementById("updateformMessage").innerHTML =
           "Record is locked. Only Admin can change it!";
         document.getElementById("updateformMessage").className = "modal-error";
-        document.getElementById("updateEmployeeButton").className =
-          "btn hide";
+        document.getElementById("updateEmployeeButton").className = "btn hide";
       } else {
         document.getElementById("updateformMessage").innerHTML = "";
         document.getElementById("updateEmployeeButton").className =
@@ -314,7 +322,9 @@ class Staff extends Component {
               <div className="card-text">
                 {"Email: " + (data.email.length > 0 ? data.email : "---")}
               </div>
-              <div className="card-text hide">{"adminLock: " + data.adminLock}</div>
+              <div className="card-text hide">
+                {"adminLock: " + data.adminLock}
+              </div>
             </div>
             <div className="row justify-content-center">
               <span
@@ -742,21 +752,23 @@ class Staff extends Component {
               </div>
               <div id="modal-delete-text" className="modal-body">
                 <strong>
-                <h6
+                  <h6
                     id="delete-employee-name"
                     className="modal-record-title text-primary"
                   >
                     Employee
-                </h6>
-                <h6
+                  </h6>
+                  <h6
                     id="delete-staffId"
                     className="modal-record-staffId text-primary"
                   >
                     ID
-                </h6>
+                  </h6>
                 </strong>
                 <p id="delete-warning-text"></p>
-                <h6 className="text-danger" id="delete-warning-confirm">Confirm</h6>
+                <h6 className="text-danger" id="delete-warning-confirm">
+                  Confirm
+                </h6>
                 {/* Success/error message */}
                 <div id="deleteformMessage"></div>
               </div>

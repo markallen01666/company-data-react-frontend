@@ -18,7 +18,6 @@ class Offices extends Component {
       this
     );
     this.handleDeleteOfficeRecord = this.handleDeleteOfficeRecord.bind(this);
-    this.handleModalDocumentReset = this.handleModalDocumentReset.bind(this);
   }
 
   // Retrieving documents from Office collection in database
@@ -153,20 +152,6 @@ class Offices extends Component {
       });
   }
 
-  // Tidy up when modal closes
-  handleModalDocumentReset() {
-    document.getElementById("addOfficeRecordForm").reset();
-    document.getElementById("formMessage").innerHTML = "";
-    document.getElementById("formMessage").className = "";
-    document.getElementById("addOfficeButton").className = "btn btn-primary";
-    document.getElementById("updateOfficeRecordForm").reset();
-    document.getElementById("updateformMessage").innerHTML = "";
-    document.getElementById("updateformMessage").className = "";
-    document.getElementById("updateOfficeButton").className = "btn btn-primary";
-    document.getElementById("deleteOfficeButton").className = "btn btn-danger";
-    document.getElementById("deleteformMessage").innerHTML = "";
-  }
-
   componentDidMount() {
     this.getOfficeData();
 
@@ -180,16 +165,31 @@ class Offices extends Component {
     document
       .getElementById("deleteOfficeButton")
       .addEventListener("click", this.handleDeleteOfficeRecord);
-    document
-      .getElementById("createDocumentCloseButton")
-      .addEventListener("click", this.handleModalDocumentReset);
-    document
-      .getElementById("updateDocumentCloseButton")
-      .addEventListener("click", this.handleModalDocumentReset);
-    document
-      .getElementById("deleteDocumentCloseButton")
-      .addEventListener("click", this.handleModalDocumentReset);
 
+  // Tidy up when modal closes
+  window.$("#createRecordModal").on("hide.bs.modal", function(event) {    
+    document.getElementById("addOfficeRecordForm").reset();
+    document.getElementById("formMessage").innerHTML = "";
+    document.getElementById("formMessage").className = "";
+    document.getElementById("addOfficeButton").className = "btn btn-primary";
+  });
+  window.$("#deleteRecordModal").on("hide.bs.modal", function(event) {
+    document.getElementById("deleteOfficeButton").className = "btn btn-danger";
+    document.getElementById("deleteformMessage").innerHTML = "";
+  });
+  window.$("#updateRecordModal").on("hide.bs.modal", function(event) {
+    document.getElementById("updateOfficeRecordForm").reset();
+    document.getElementById("updateformMessage").innerHTML = "";
+    document.getElementById("updateformMessage").className = "";
+    document.getElementById("updateOfficeButton").className = "btn btn-primary";
+      // clear adminLocked fields on update modal
+      document.getElementById("modal-update-building").disabled = false;
+      document.getElementById("modal-update-number").disabled = false;
+      document.getElementById("modal-update-street").disabled = false;
+      document.getElementById("modal-update-town").disabled = false;
+      document.getElementById("modal-update-postcode").disabled = false;
+      document.getElementById("modal-update-adminLock").disabled = false;
+    });
     // Inject card specific information into 'change' and 'delete' modals
     window.$("#deleteRecordModal").on("show.bs.modal", function(event) {
       let button = window.$(event.relatedTarget); // Button/Span that triggered the modal
@@ -240,6 +240,14 @@ class Offices extends Component {
         "record-adminlock"
       );
       if (button.data("record-adminlock") === true) {
+        // for updates, grey out all fields on adminLock === true
+        document.getElementById("modal-update-building").disabled = true;
+        document.getElementById("modal-update-office").disabled = true;
+        document.getElementById("modal-update-number").disabled = true;
+        document.getElementById("modal-update-street").disabled = true;
+        document.getElementById("modal-update-town").disabled = true;
+        document.getElementById("modal-update-postcode").disabled = true;
+        document.getElementById("modal-update-adminLock").disabled = true;
         document.getElementById("updateformMessage").innerHTML =
           "Record is locked. Only Admin can change it!";
         document.getElementById("updateformMessage").className = "modal-error";
