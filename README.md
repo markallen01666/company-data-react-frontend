@@ -15,6 +15,7 @@ You can access the current version at: https://company123uk.firebaseapp.com/
 
 This project is very much a work in progress - I'll be adding more functionality over time. Planned work:
 
+- Explore creating React Native app for frontend on mobiles
 - Full refactoring of the code in Offices.js and Staff.js as both have become monolithic
 - Validation on entry/update fields - e.g. valid telephone numbers, staff ID codes etc
 - Dropdown list of sort options - e.g. list staff by office
