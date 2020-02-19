@@ -18,7 +18,7 @@ This project is very much a work in progress
 
 Current status: 
 
-Work on this web app is paused. I'm currently working on building up my React Native skills so that I can get an Android/iOS app that delivers the same functionality as this web app before adding any more to it. This will mean that I can then work on the development of both, hand-in-hand, wrt things like a user login etc, rather than doing the work twice at separate times.
+Work on this web app is paused. I'm currently working on building up my React and React Native skills so that I can imporve this app and build an Android/iOS app that delivers the same functionality before adding any more to it. This will mean that I can then work on the development of both, hand-in-hand, wrt things like a user login etc, rather than doing the work twice at separate times.
 
 
 I'll be adding more functionality over time. Planned work:
